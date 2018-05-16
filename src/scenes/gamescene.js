@@ -11,6 +11,11 @@ var cursors;
 var stars;
 var spaceKey;
 
+var leftKey;
+var rightKey;
+var upKey;
+var downKey;
+
 export default class GameScene extends Phaser.Scene{
     
     constructor(){
@@ -82,13 +87,23 @@ export default class GameScene extends Phaser.Scene{
         //                         null, this);
 
         spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
+    }
+
+    pressed(e) {
+        console.log(e)
+    }
+
+    movePlayerLeft(p) {
+        p.setVelocityX(-160);
+
+        p.anims.play('left', true);
     }
 
     update(){
-        if (cursors.left.isDown){
-            player.setVelocityX(-160);
 
-            player.anims.play('left', true);
+        if (cursors.left.isDown || leftKey.isDown){
+            this.movePlayerLeft(player)
         }
         else if (cursors.right.isDown){
             player.setVelocityX(160);
