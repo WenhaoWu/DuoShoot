@@ -111,6 +111,9 @@ export default class GameScene extends Phaser.Scene{
         this.physics.add.collider(player1, platforms);
         this.physics.add.collider(player2, platforms);
 
+        //Set initial ammo
+        player1.ammo = 3;
+        player2.ammo = 3;
     }
 
     update(){        
@@ -168,11 +171,12 @@ export default class GameScene extends Phaser.Scene{
 
         let currentPos = p.anims.currentFrame.textureFrame;
 
-        if (currentPos == 0) return;
+        if (currentPos == 0 || p.ammo<=0) return;
 
         let sx = p.x
         let sy = p.y
         let b = this.physics.add.sprite(sx, sy, 'bomb');
+        b.body.allowGravity = false;
 
         if (currentPos < 8){
             b.setVelocityX(-500);
@@ -181,5 +185,7 @@ export default class GameScene extends Phaser.Scene{
             b.setVelocityX(500);
         }
         this.physics.add.collider(b, platforms);
+
+        p.ammo -= 1;
     }
 }
