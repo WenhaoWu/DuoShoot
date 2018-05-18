@@ -123,7 +123,7 @@ export default class GameScene extends Phaser.Scene{
         this.physics.add.overlap(player1, stars, this.pylayerEnergy);
         this.physics.add.overlap(player2, stars, this.pylayerEnergy);
 
-        winner = this.add.text(10, 10, 'Winner: None', { font: '32px Courier', fill: '#000000' });
+        winner = this.add.text(10, 10, 'Winner: None', { font: '32px Courier', fill: '#FFFFFF' });
     }
 
     pylayerEnergy(p, s){
