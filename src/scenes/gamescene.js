@@ -112,7 +112,7 @@ export default class GameScene extends Phaser.Scene{
 
         this.physics.add.collider(player1, platforms);
         this.physics.add.collider(player2, platforms);
-
+        
         //Set initial ammo
         player1.ammo = 3;
         player2.ammo = 3;
@@ -230,7 +230,7 @@ export default class GameScene extends Phaser.Scene{
         }
         this.physics.add.collider(b, platforms);
 
-        this.physics.add.overlap(b, foe, this.bulletHit(b,foe));
+        this.physics.add.overlap(b, foe, this.bulletHit);
 
         self.ammo -= 1;
     }
@@ -238,7 +238,8 @@ export default class GameScene extends Phaser.Scene{
     bulletHit(bullet, foe){
         console.log(bullet.x)
         console.log(foe.x)
-        // foe.disableBody(true, true);
+        foe.disableBody(true, true);
+        bullet.disableBody(true, true);
     }
     
 }
