@@ -5,16 +5,18 @@ import platform from "../assets/platform.png";
 import star from "../assets/star.png";
 import dude from "../assets/dude.png";
 
-var player;
+var firstPlayer;
+var secondPlayer;
+
 var platforms;
 var cursors;
 var stars;
-var spaceKey;
 
-var leftKey;
-var rightKey;
-var upKey;
-var downKey;
+var firstPlayerShootKey;
+var secondPlayerShootKey;
+var secondPlayerLeftKey;
+var secondPlayerRightKey;
+var secondPlayerUpKey;
 
 export default class GameScene extends Phaser.Scene{
     
@@ -34,6 +36,85 @@ export default class GameScene extends Phaser.Scene{
     }
 
     create(){
+
+        // Scene background
+        this.sceneBackgroundSetup()
+
+        // First player
+        firstPlayer = this.physics.add.sprite(100, 450, 'dude');
+        this.playerSetup(firstPlayer)
+
+        // Second player
+        secondPlayer = this.physics.add.sprite(600, 450, 'dude2')
+        this.playerSetup(secondPlayer)
+
+        // Anims, what are thoooose? :D 
+        this.setSomeAnims()
+
+        // Player 1 keys
+        cursors = this.input.keyboard.createCursorKeys();
+        firstPlayerShootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        // Player 2 keys
+        secondPlayerShootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
+        secondPlayerLeftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
+        secondPlayerRightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+        secondPlayerUpKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
+    }
+
+    update(){
+
+        // Left - Right movement
+
+        if (cursors.left.isDown || cursors.right.isDown) {
+            this.movePlayerLeft(cursors.left.isDown, firstPlayer)
+        } else { firstPlayer.setVelocityX(0) }
+        if (secondPlayerLeftKey.isDown || secondPlayerRightKey.isDown) {
+            this.movePlayerLeft(secondPlayerLeftKey.isDown, secondPlayer) // TODO: second player
+        } else { secondPlayer.setVelocityX(0) }
+
+        // Jump
+
+        var firstPlayerShouldJump = firstPlayer.body.touching.down && cursors.up.isDown
+        var secondPlayerShouldJump = secondPlayer.body.touching.down && secondPlayerUpKey.isDown // TODO:
+
+        if (firstPlayerShouldJump) { this.movePlayerUp(firstPlayer) }
+        if (secondPlayerShouldJump) { this.movePlayerUp(secondPlayer) } // TODO:
+
+        // Shoot
+
+        if (Phaser.Input.Keyboard.JustDown(firstPlayerShootKey)){
+            this.shootFrom(firstPlayer)
+        } else if (Phaser.Input.Keyboard.JustDown(secondPlayerShootKey)) {
+            this.shootFrom(secondPlayer)
+        }
+    }
+
+    // Private action methods
+
+    movePlayerLeft(isLeft, player) {
+        var offsetAndDirection = isLeft == true ? [-160, "left"] : [160, "right"]
+        player.setVelocityX(offsetAndDirection[0]);
+
+        player.anims.play(offsetAndDirection[1], true);
+    }
+
+    movePlayerUp(player) {
+        player.setVelocityY(-330);
+    }
+
+    /// Crashes if player hasn't moved left or right before moving.
+    /// Some issue on .currentFrame call.
+    shootFrom(player) {
+        let bomb = this.physics.add.sprite(player.x, player.y, 'bomb');
+        let currentPos = player.anims.currentFrame.textureFrame;
+        bomb.setVelocityX(currentPos < 4 ? -500 : 500)
+        this.physics.add.collider(bomb, platforms);
+    }
+
+    // Private set-up methods
+
+    sceneBackgroundSetup() {
         this.add.image(400, 300, 'sky');
         
         platforms = this.physics.add.staticGroup();
@@ -42,12 +123,15 @@ export default class GameScene extends Phaser.Scene{
         platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
+    }
 
-        player = this.physics.add.sprite(100, 450, 'dude');
-        
+    playerSetup(player) {
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
+        this.physics.add.collider(player, platforms);
+    }
 
+    setSomeAnims() {
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 3}),
@@ -67,70 +151,5 @@ export default class GameScene extends Phaser.Scene{
             frameRate: 10,
             repeat: -1
         });
-
-        cursors = this.input.keyboard.createCursorKeys();
-        this.physics.add.collider(player, platforms);
-
-        // stars = this.physics.add.group({
-        //     key : 'star',
-        //     repeat: 11,
-        //     setXY: {x: 12, y: 0, stepX: 70}
-        // })
-        
-        // stars.children.iterate(function (child) {
-        //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        // })
-
-        // this.physics.add.collider(stars, platforms);
-        // this.physics.add.overlap(player, stars, 
-        //                         (player, star)=>star.disableBody(true, true), 
-        //                         null, this);
-
-        spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
-    }
-
-    pressed(e) {
-        console.log(e)
-    }
-
-    movePlayerLeft(p) {
-        p.setVelocityX(-160);
-
-        p.anims.play('left', true);
-    }
-
-    update(){
-
-        if (cursors.left.isDown || leftKey.isDown){
-            this.movePlayerLeft(player)
-        }
-        else if (cursors.right.isDown){
-            player.setVelocityX(160);
-
-            player.anims.play('right', true);
-        }
-        else{
-            player.setVelocityX(0);
-            player.anims.play('turn');
-        }
-
-        if (cursors.up.isDown && player.body.touching.down){
-            player.setVelocityY(-330);
-        }
-
-        if(Phaser.Input.Keyboard.JustDown(spaceKey)){
-            let sx = player.x
-            let sy = player.y
-            let b = this.physics.add.sprite(sx, sy, 'bomb');
-            let currentPos = player.anims.currentFrame.textureFrame;
-            if (currentPos < 4){
-                b.setVelocityX(-500);
-            }
-            else {
-                b.setVelocityX(500);
-            }
-            this.physics.add.collider(b, platforms);
-        }
     }
 }
