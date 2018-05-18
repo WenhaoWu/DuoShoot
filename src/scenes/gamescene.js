@@ -6,16 +6,14 @@ import star from "../assets/star.png";
 import ironman from "../assets/ironman.png";
 import hulk from "../assets/hulk.png"
 
-var player;
-var platforms;
-var cursors;
-var stars;
-var spaceKey;
+var player1;
+var player2;
 
-var leftKey;
-var rightKey;
-var upKey;
-var downKey;
+var platforms;
+var stars;
+
+var wKey, aKey, sKey, dKey, qKey;
+var iKey, jKey, kKey, lKey, uKey;
 
 export default class GameScene extends Phaser.Scene{
     
@@ -32,10 +30,22 @@ export default class GameScene extends Phaser.Scene{
             ironman,
             { frameWidth: 32, frameHeight: 48 }
         );
+        this.load.spritesheet('hulk', 
+            hulk,
+            { frameWidth: 40, frameHeight: 56 }
+        );
 
-        cursors = this.input.keyboard.createCursorKeys();
-        spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
+        wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        qKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        
+        iKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+        jKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+        kKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+        lKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L);
+        uKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.U);
     }
 
     create(){
@@ -48,67 +58,109 @@ export default class GameScene extends Phaser.Scene{
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
 
-        player = this.physics.add.sprite(100, 450, 'ironman');
+        player1 = this.physics.add.sprite(100, 450, 'ironman');
         
-        player.setBounce(0.2);
-        player.setCollideWorldBounds(true);
+        player1.setBounce(0.2);
+        player1.setCollideWorldBounds(true);
 
         this.anims.create({
-            key: 'left',
+            key: 'left1',
             frames: this.anims.generateFrameNumbers('ironman', {start: 4, end: 7}),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
-            key: 'turn',
+            key: 'turn1',
             frames: [{key: 'ironman', frame: 0}],
             frameRate: 20
         });
 
         this.anims.create({
-            key: 'right',
+            key: 'right1',
             frames: this.anims.generateFrameNumbers('ironman', {start: 8, end: 11}),
             frameRate: 10,
             repeat: -1
         });
 
-        this.physics.add.collider(player, platforms);
-    }
-
-    movePlayerLeft(p) {
-        p.setVelocityX(-160);
-        p.anims.play('left', true);
-    }
-
-    movePlayerRight(p){
-        p.setVelocityX(160);
-        p.anims.play('right', true);
-    }
-    
-    stillPlayer(p){
-        player.setVelocityX(0);
-        player.anims.play('turn');
-    }
-
-    update(){
+        player2 = this.physics.add.sprite(500, 450, 'hulk');
         
-        if (cursors.left.isDown){
-            this.movePlayerLeft(player)
+        player2.setBounce(0.2);
+        player2.setCollideWorldBounds(true);
+
+        this.anims.create({
+            key: 'left2',
+            frames: this.anims.generateFrameNumbers('hulk', {start: 4, end: 7}),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'turn2',
+            frames: [{key: 'hulk', frame: 0}],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'right2',
+            frames: this.anims.generateFrameNumbers('hulk', {start: 8, end: 11}),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.physics.add.collider(player1, platforms);
+        this.physics.add.collider(player2, platforms);
+
+    }
+
+    update(){        
+        this.actionPlayer1();
+        this.actionPlayer2();
+    }
+
+    actionPlayer1(){
+        if (aKey.isDown){
+            player1.setVelocityX(-160);
+            player1.anims.play('left1', true);
         }
-        else if (cursors.right.isDown){
-            this.movePlayerRight(player)
+        else if (dKey.isDown){
+            player1.setVelocityX(160);
+            player1.anims.play('right1', true);
         }
         else{
-           this.stillPlayer(player)
+            player1.setVelocityX(0);
+            player1.anims.play('turn1');
         }
 
-        if (cursors.up.isDown && player.body.touching.down){
-            player.setVelocityY(-330);
+        if (wKey.isDown && player1.body.touching.down){
+            player1.setVelocityY(-330);
         }
 
-        if(Phaser.Input.Keyboard.JustDown(spaceKey)){
-            this.shootBullet(player)
+        if(Phaser.Input.Keyboard.JustDown(sKey)){
+            this.shootBullet(player1)
+        }
+    }
+
+    actionPlayer2(){
+        if (jKey.isDown){
+            player2.setVelocityX(-160);
+            player2.anims.play('left2', true);
+        }
+        else if (lKey.isDown){
+            player2.setVelocityX(160);
+            player2.anims.play('right2', true);
+        }
+        else{
+            player2.setVelocityX(0);
+            player2.anims.play('turn2');
+        }
+
+        if (iKey.isDown && player2.body.touching.down){
+            player2.setVelocityY(-330);
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(kKey)){
+            this.shootBullet(player2)
         }
     }
 
