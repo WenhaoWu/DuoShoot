@@ -12,6 +12,8 @@ var player2;
 var platforms;
 var stars;
 
+var winner;
+
 var wKey, aKey, sKey, dKey, qKey;
 var iKey, jKey, kKey, lKey, uKey;
 
@@ -120,6 +122,8 @@ export default class GameScene extends Phaser.Scene{
 
         this.physics.add.overlap(player1, stars, this.pylayerEnergy);
         this.physics.add.overlap(player2, stars, this.pylayerEnergy);
+
+        winner = this.add.text(10, 10, 'Winner: None', { font: '32px Courier', fill: '#000000' });
     }
 
     pylayerEnergy(p, s){
@@ -180,7 +184,7 @@ export default class GameScene extends Phaser.Scene{
         }
 
         if(Phaser.Input.Keyboard.JustDown(sKey)){
-            this.shootBullet(player1)
+            this.shootBullet(player1, player2)
         }
     }
 
@@ -203,18 +207,18 @@ export default class GameScene extends Phaser.Scene{
         }
 
         if(Phaser.Input.Keyboard.JustDown(kKey)){
-            this.shootBullet(player2)
+            this.shootBullet(player2, player1)
         }
     }
 
-    shootBullet(p){
+    shootBullet(self, foe){
 
-        let currentPos = p.anims.currentFrame.textureFrame;
+        let currentPos = self.anims.currentFrame.textureFrame;
 
-        if (currentPos == 0 || p.ammo<=0) return;
+        if (currentPos == 0 || self.ammo<=0) return;
 
-        let sx = p.x
-        let sy = p.y
+        let sx = self.x
+        let sy = self.y
         let b = this.physics.add.sprite(sx, sy, 'bomb');
         b.body.allowGravity = false;
 
@@ -226,6 +230,15 @@ export default class GameScene extends Phaser.Scene{
         }
         this.physics.add.collider(b, platforms);
 
-        p.ammo -= 1;
+        this.physics.add.overlap(b, foe, this.bulletHit(b,foe));
+
+        self.ammo -= 1;
     }
+
+    bulletHit(bullet, foe){
+        console.log(bullet.x)
+        console.log(foe.x)
+        // foe.disableBody(true, true);
+    }
+    
 }
