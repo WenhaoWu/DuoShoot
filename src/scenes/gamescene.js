@@ -239,6 +239,7 @@ export default class GameScene extends Phaser.Scene{
         foe.disableBody(true, true);
         bullet.disableBody(true, true);
         winner.setText(`${foe.texture.key} is dead!!!!`);
+        window.location.reload();
     }
     
 }
