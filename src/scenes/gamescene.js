@@ -124,6 +124,8 @@ export default class GameScene extends Phaser.Scene{
         this.physics.add.overlap(player2, stars, this.pylayerEnergy);
 
         winner = this.add.text(10, 10, 'Win or Die!' , { font: '32px Courier', fill: '#FFFFFF' });
+        this.add.text(10, 40, 'Team member 1: Wenhao Wu(1304952)' , { font: '32px Courier', fill: '#FFFFFF' });
+        this.add.text(10, 70, 'Team member 2: Lukas Dagne(1304981)' , { font: '32px Courier', fill: '#FFFFFF' });
     }
 
     pylayerEnergy(p, s){
@@ -161,6 +163,8 @@ export default class GameScene extends Phaser.Scene{
     }
 
     update(){
+
+        
         this.actionPlayer1();
         this.actionPlayer2();
     }
