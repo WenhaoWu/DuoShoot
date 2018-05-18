@@ -236,9 +236,8 @@ export default class GameScene extends Phaser.Scene{
     }
 
     bulletHit(bullet, foe){
-        console.log(bullet.x)
-        console.log(foe.x)
         foe.disableBody(true, true);
+        bullet.disableBody(true, true);
     }
     
 }
