@@ -114,6 +114,32 @@ export default class GameScene extends Phaser.Scene{
         //Set initial ammo
         player1.ammo = 3;
         player2.ammo = 3;
+
+        //  Create 10 random stars pick-ups
+        stars = this.physics.add.staticGroup({
+            key: 'star',
+            frameQuantity: 10,
+            immovable: true
+        });
+
+        var children = stars.getChildren();
+
+        for (var i = 0; i < children.length; i++){
+            var x = Phaser.Math.Between(50, 750);
+            var y = Phaser.Math.Between(50, 550);
+    
+            children[i].setPosition(x, y);
+        }
+    
+        stars.refresh();
+        this.physics.add.overlap(player1, stars, this.pylayerEnergy);
+        this.physics.add.overlap(player2, stars, this.pylayerEnergy);
+    }
+
+    pylayerEnergy(p, s){
+        stars.killAndHide(s);
+        s.body.enable = false;
+        p.ammo += 1;
     }
 
     update(){        
