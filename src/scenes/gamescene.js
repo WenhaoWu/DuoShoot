@@ -160,7 +160,7 @@ export default class GameScene extends Phaser.Scene{
         stars.refresh();
     }
 
-    update(){        
+    update(){
         this.actionPlayer1();
         this.actionPlayer2();
     }
@@ -238,6 +238,7 @@ export default class GameScene extends Phaser.Scene{
     bulletHit(bullet, foe){
         foe.disableBody(true, true);
         bullet.disableBody(true, true);
+        winner.setText(`${foe.texture.key} is dead!!!!`);
     }
     
 }
