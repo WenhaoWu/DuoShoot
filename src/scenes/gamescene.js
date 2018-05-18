@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import sky from "../assets/sky.png";
+import background from "../assets/bg_star.jpg";
 import bomb from "../assets/bomb.png";
 import platform from "../assets/platform.png";
 import star from "../assets/star.png";
@@ -22,7 +22,7 @@ export default class GameScene extends Phaser.Scene{
     }
 
     preload(){
-        this.load.image('sky', sky);
+        this.load.image('background', background);
         this.load.image('ground', platform);
         this.load.image('star', star);
         this.load.image('bomb', bomb);
@@ -49,7 +49,7 @@ export default class GameScene extends Phaser.Scene{
     }
 
     create(){
-        this.add.image(400, 300, 'sky');
+        this.add.image(400, 300, 'background');
         
         platforms = this.physics.add.staticGroup();
 
