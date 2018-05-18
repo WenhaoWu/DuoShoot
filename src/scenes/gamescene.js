@@ -3,7 +3,8 @@ import sky from "../assets/sky.png";
 import bomb from "../assets/bomb.png";
 import platform from "../assets/platform.png";
 import star from "../assets/star.png";
-import dude from "../assets/dude.png";
+import ironman from "../assets/ironman.png";
+import hulk from "../assets/hulk.png"
 
 var player;
 var platforms;
@@ -27,10 +28,14 @@ export default class GameScene extends Phaser.Scene{
         this.load.image('ground', platform);
         this.load.image('star', star);
         this.load.image('bomb', bomb);
-        this.load.spritesheet('dude', 
-            dude,
+        this.load.spritesheet('ironman', 
+            ironman,
             { frameWidth: 32, frameHeight: 48 }
         );
+
+        cursors = this.input.keyboard.createCursorKeys();
+        spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
     }
 
     create(){
@@ -43,76 +48,59 @@ export default class GameScene extends Phaser.Scene{
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
 
-        player = this.physics.add.sprite(100, 450, 'dude');
+        player = this.physics.add.sprite(100, 450, 'ironman');
         
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
 
         this.anims.create({
             key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 3}),
+            frames: this.anims.generateFrameNumbers('ironman', {start: 4, end: 7}),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'turn',
-            frames: [{key: 'dude', frame: 4}],
+            frames: [{key: 'ironman', frame: 0}],
             frameRate: 20
         });
 
         this.anims.create({
             key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', {start: 5, end: 8}),
+            frames: this.anims.generateFrameNumbers('ironman', {start: 8, end: 11}),
             frameRate: 10,
             repeat: -1
         });
 
-        cursors = this.input.keyboard.createCursorKeys();
         this.physics.add.collider(player, platforms);
-
-        // stars = this.physics.add.group({
-        //     key : 'star',
-        //     repeat: 11,
-        //     setXY: {x: 12, y: 0, stepX: 70}
-        // })
-        
-        // stars.children.iterate(function (child) {
-        //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        // })
-
-        // this.physics.add.collider(stars, platforms);
-        // this.physics.add.overlap(player, stars, 
-        //                         (player, star)=>star.disableBody(true, true), 
-        //                         null, this);
-
-        spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
-    }
-
-    pressed(e) {
-        console.log(e)
     }
 
     movePlayerLeft(p) {
         p.setVelocityX(-160);
-
         p.anims.play('left', true);
     }
 
-    update(){
+    movePlayerRight(p){
+        p.setVelocityX(160);
+        p.anims.play('right', true);
+    }
+    
+    stillPlayer(p){
+        player.setVelocityX(0);
+        player.anims.play('turn');
+    }
 
-        if (cursors.left.isDown || leftKey.isDown){
+    update(){
+        
+        if (cursors.left.isDown){
             this.movePlayerLeft(player)
         }
         else if (cursors.right.isDown){
-            player.setVelocityX(160);
-
-            player.anims.play('right', true);
+            this.movePlayerRight(player)
         }
         else{
-            player.setVelocityX(0);
-            player.anims.play('turn');
+           this.stillPlayer(player)
         }
 
         if (cursors.up.isDown && player.body.touching.down){
@@ -120,17 +108,26 @@ export default class GameScene extends Phaser.Scene{
         }
 
         if(Phaser.Input.Keyboard.JustDown(spaceKey)){
-            let sx = player.x
-            let sy = player.y
-            let b = this.physics.add.sprite(sx, sy, 'bomb');
-            let currentPos = player.anims.currentFrame.textureFrame;
-            if (currentPos < 4){
-                b.setVelocityX(-500);
-            }
-            else {
-                b.setVelocityX(500);
-            }
-            this.physics.add.collider(b, platforms);
+            this.shootBullet(player)
         }
+    }
+
+    shootBullet(p){
+
+        let currentPos = p.anims.currentFrame.textureFrame;
+
+        if (currentPos == 0) return;
+
+        let sx = p.x
+        let sy = p.y
+        let b = this.physics.add.sprite(sx, sy, 'bomb');
+
+        if (currentPos < 8){
+            b.setVelocityX(-500);
+        }
+        else {
+            b.setVelocityX(500);
+        }
+        this.physics.add.collider(b, platforms);
     }
 }
